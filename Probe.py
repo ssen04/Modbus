@@ -4,22 +4,10 @@ import time
 import datetime
 import argparse
 
-# # Parameters
-# parser = argparse.ArgumentParser(
-#     description="Modbus data logger"
-# )
-#
-# parser.add_argument('port', help="The COM port where the probe is attached")
-# parser.add_argument('-f', '--file', help="The file name to store the data (default data.csv)", default="data.csv")
-# parser.add_argument('-a', '--address', help="The address of the probe (default 240)", default=240, type=int)
-# parser.add_argument('-r', "--rate", help="The poll rate in seconds (default 1)", default=1, type=float)
-# parser.add_argument('-l', '--length', help="The length of time in hours to data log (default 9999999)", type=float, default=9999999)
-#
-# args = parser.parse_args()
-# print(args)
 RATE = 1
 LENGTH = 48
 FILE = 'datalog.csv'
+
 # Modbus connection
 probe = ModbusClient(method='rtu', port='COM7', timeout=1, baudrate=9600, stopbits=1, parity='N')
 
