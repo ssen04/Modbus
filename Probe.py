@@ -4,24 +4,26 @@ import time
 import datetime
 import argparse
 
-# Parameters
-parser = argparse.ArgumentParser(
-    description="Modbus data logger"
-)
-
-parser.add_argument('port', help="The COM port where the probe is attached")
-parser.add_argument('-f', '--file', help="The file name to store the data (default data.csv)", default="data.csv")
-parser.add_argument('-a', '--address', help="The address of the probe (default 240)", default=240, type=int)
-parser.add_argument('-r', "--rate", help="The poll rate in seconds (default 1)", default=1, type=float)
-parser.add_argument('-l', '--length', help="The length of time in hours to data log (default 9999999)", type=float, default=9999999)
-
-args = parser.parse_args()
-print(args)
-
+# # Parameters
+# parser = argparse.ArgumentParser(
+#     description="Modbus data logger"
+# )
+#
+# parser.add_argument('port', help="The COM port where the probe is attached")
+# parser.add_argument('-f', '--file', help="The file name to store the data (default data.csv)", default="data.csv")
+# parser.add_argument('-a', '--address', help="The address of the probe (default 240)", default=240, type=int)
+# parser.add_argument('-r', "--rate", help="The poll rate in seconds (default 1)", default=1, type=float)
+# parser.add_argument('-l', '--length', help="The length of time in hours to data log (default 9999999)", type=float, default=9999999)
+#
+# args = parser.parse_args()
+# print(args)
+RATE = 1
+LENGTH = 48
+FILE = 'datalog.csv'
 # Modbus connection
-probe = ModbusClient(method='rtu', port=args.port, timeout=1, baudrate=9600, stopbits=1, parity='N')
+probe = ModbusClient(method='rtu', port='COM7', timeout=1, baudrate=9600, stopbits=1, parity='N')
 
-end = datetime.datetime.now() + datetime.timedelta(hours=args.length)
+end = datetime.datetime.now() + datetime.timedelta(hours=LENGTH)
 
 print("End date and time: ", end)
 
@@ -38,9 +40,7 @@ def data_from_register(registers, i):
 # Returns False, None, None, None if not
 def holding_registers_data():
     try:
-
-        registers = probe.read_holding_registers(address=0, count=10, unit=args.address).registers
-
+        registers = probe.read_holding_registers(address=0, count=10, unit=240).registers
 
     except Exception as e:
         print(e)
@@ -56,6 +56,7 @@ def holding_registers_data():
 
     return True, rh, t, dp
 
+
 # Logging the data
 
 # Reads relative humidity, temperature and dew point from holding_registers_data() and writes the values to a csv file with the date and time
@@ -66,14 +67,14 @@ def data_logger():
         dt = datetime.datetime.now()
 
         try:
-            with open(args.file, "a") as f:
-                line = f"{dt},{rh},{t},{dp}\n"
+            with open(FILE, "a") as f:
+                line = f"Date and Time: {dt}, RH: {rh}, Temperature: {t}, Dew Point {dp}\n"
                 print(line)
                 f.write(line)
         except Exception as e:
             print(e)
         probe.close()
-        time.sleep(args.rate)
+        time.sleep(RATE)
 
     else:
         probe.close()
