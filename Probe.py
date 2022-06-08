@@ -2,14 +2,15 @@ from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 import struct
 import time
 import datetime
-import argparse
 
-RATE = 1
-LENGTH = 48
-FILE = 'datalog.csv'
+RATE = 1  # The poll rate in seconds (default 1)
+LENGTH = 48  # The length of time in hours to data log (default 9999999)
+FILE = 'datalog.csv'  # The filename to store the data (default data.csv)
+PORT = 'COM7'  # Communication port of the probe
+ADDRESS = 240  # The address of the probe (default 240)
 
 # Modbus connection
-probe = ModbusClient(method='rtu', port='COM7', timeout=1, baudrate=9600, stopbits=1, parity='N')
+probe = ModbusClient(method='rtu', port=PORT, timeout=1, baudrate=9600, stopbits=1, parity='N')
 
 end = datetime.datetime.now() + datetime.timedelta(hours=LENGTH)
 
@@ -24,11 +25,11 @@ def data_from_register(registers, i):
 
 
 # Reads the holding registers of the probe and returns the values as 32-bit float
-# Returns True, Relative Humidity, Temperature and Dew Point if read sucessfully
+# Returns True, Relative Humidity, Temperature and Dew Point if read successfully
 # Returns False, None, None, None if not
 def holding_registers_data():
     try:
-        registers = probe.read_holding_registers(address=0, count=10, unit=240).registers
+        registers = probe.read_holding_registers(address=0, count=10, unit=ADDRESS).registers
 
     except Exception as e:
         print(e)
